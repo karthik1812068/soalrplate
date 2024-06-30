@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="background">
+    <div class="overlay"></div>
+    <div class="content">
+        <h1>Track by Panel ID</h1>
+        <div class="container">
+            <form method="POST">
+                <label for="panel_id">Enter Panel ID:</label>
+                <input type="text" id="panel_id" name="panel_id" required>
+                <button type="submit">Get Panel Details</button>
+            </form>
+            {% if panel %}
+                <div id="panel-details">
+                    <h2>Panel Details</h2>
+                    <p><strong>ID:</strong> {{ panel.id }}</p>
+                    <p><strong>Type:</strong> {{ panel.type }}</p>
+                    <p><strong>Manufacturer:</strong> {{ panel.manufacturer }}</p>
+                    <p><strong>Capacity:</strong> {{ panel.capacity }}</p>
+                    <p><strong>Installation Date:</strong> {{ panel.installation_date }}</p>
+                </div>
+            {% elif panel is not none %}
+                <p>Panel not found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

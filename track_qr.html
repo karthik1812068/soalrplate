@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="background">
+    <div class="overlay"></div>
+    <div class="content">
+        <h1>Scan QR Code</h1>
+        <div class="container">
+            <p>Scan the QR code on the solar panel to access its details:</p>
+            <div id="qr-reader"></div>
+            <div id="panel-details"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://rawgit.com/LazarSoft/jsqrcode/master/src/qr_packed.js"></script>
+<script>
+    const qrReader = document.getElementById('qr-reader');
+    const panelDetails = document.getElementById('panel-details');
+
+    function readQRCode() {
+        const canvasElement = document.createElement('canvas');
+        const canvas = canvasElement.getContext('2d');
+        const video = document.createElement('video');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function (stream) {
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true); // required to tell iOS safari we don't want fullscreen
+                video.play();
+                requestAnimationFrame(tick);
+            });
+
+        function tick() {
+            qrReader.innerHTML = '';
+            qrReader.append(video);
+            try {
+                canvasElement.width = video.videoWidth;
+                canvasElement.height = video.videoHeight;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                if (code) {
+                    panelDetails.innerHTML = '';
+                    fetch(`/panel/${code.data}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                panelDetails.innerHTML = '<p>Panel not found</p>';
+                            } else {
+                                panelDetails.innerHTML = `
+                                    <h2>Panel Details</h2>
+                                    <p><strong>ID:</strong> ${data.id}</p>
+                                    <p><strong>Type:</strong> ${data.type}</p>
+                                    <p><strong>Manufacturer:</strong> ${data.manufacturer}</p>
+                                    <p><strong>Capacity:</strong> ${data.capacity}</p>
+                                    <p><strong>Installation Date:</strong> ${data.installation_date}</p>
+                                `;
+                            }
+                        });
+                }
+            } catch (e) {
+                console.error('Error reading QR code', e);
+            }
+            requestAnimationFrame(tick);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        readQRCode();
+    });
+</script>
+{% endblock %}

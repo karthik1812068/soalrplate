@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Panel Frequency</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Solar Panel Frequency Calculator</h1>
+        <div class="frequency-details">
+            <div class="input-section">
+                <label for="voltage">Voltage (V):</label>
+                <input type="number" id="voltage" name="voltage" required>
+                <br>
+                <label for="current">Current (A):</label>
+                <input type="number" id="current" name="current" required>
+                <br>
+                <label for="capacitance">Capacitance (F):</label>
+                <input type="number" id="capacitance" name="capacitance" required>
+                <br>
+                <button id="calculateButton">Calculate Frequency</button>
+            </div>
+            <div class="output-section">
+                <p id="frequencyOutput" style="display: none;">Frequency: <span id="frequencyValue"></span> Hz</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('calculateButton').addEventListener('click', function() {
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const current = parseFloat(document.getElementById('current').value);
+            const capacitance = parseFloat(document.getElementById('capacitance').value);
+            
+            if (isNaN(voltage) || isNaN(current) || isNaN(capacitance) || capacitance <= 0) {
+                alert('Please enter valid positive numbers for all fields.');
+                return;
+            }
+            
+            const frequency = voltage / (current * capacitance);
+            document.getElementById('frequencyValue').textContent = frequency.toFixed(2);
+            document.getElementById('frequencyOutput').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
